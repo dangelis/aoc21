@@ -2,8 +2,9 @@ import copy
 
 def read_input():
     lines = None
-    # with open('input.txt') as f:
-    with open('test.txt') as f:
+    with open('input.txt') as f:
+    # with open('test.txt') as f:
+    # with open('col_test.txt') as f:
         lines = f.readlines()
 
     if lines == None:
@@ -30,8 +31,14 @@ def check_number(num: int, board: list, board_index: int, board_found_list: list
     row_idx = 0
     for row in board:
         try:
-            # print(f"    row: {row}")
             found_idx = row.index(num)
+
+            # What if there are multiple machtes per row -- doesn't look like they exist
+            # found_indexes = [i for i, x in enumerate(row) if x == num]
+            # if len(found_indexes) > 1:
+            #     print(f"Found a multiliner!!!!!!")
+
+            # print(f"    found match at board {board_idx}, row {row_idx}, column {found_idx}")
             board_found_list[board_index][row_idx][found_idx] = True
             # for board in board_found_list:
             #     # print(f"        {board}")
@@ -61,9 +68,10 @@ def check_bingo(board_found_list: list):
             break
 
         # Check columns
-        col_check = True
+
         # print(f"checking columns for board {board_idx}:")
         for col_idx in range(len(board[0])):
+            col_check = True
             # print(f"    checking column {col_idx}")
             for row_idx in range(len(board)):
                 
@@ -81,6 +89,9 @@ def check_bingo(board_found_list: list):
     return winning_board_idx
 
 
+
+#################################
+
 data = read_input()
 
 drawn_numbers_strings = data[0].strip().split(",")
@@ -92,7 +103,6 @@ del(data[0]) # Remove the top lines so that what's left is just the board data
 del(data[0])
 
 print(f"drawn_numbers: {drawn_numbers}")
-
 
 # Build the boards
 boards_found_number_list = [None]
@@ -117,7 +127,6 @@ for line in data:
         board.clear()
         board_found_number_list.clear()
 
-        
         boards.append([None])
         boards_found_number_list.append([None])
 
@@ -127,43 +136,76 @@ for line in data:
 boards[board_idx] = copy.deepcopy(board)
 boards_found_number_list[board_idx] = copy.deepcopy(board_found_number_list)
 
-# print(f"boards:")
-# for board in boards:
-#     print(f"board:\n{board}")
+print(f"boards:")
+for board in boards:
+    print(f"board:\n{board}")
 
-# print(f"boards_found_number_list:")
-# for board in boards_found_number_list:
-#     print(f"board:\n{board}")
+print(f"boards_found_number_list:")
+for board in boards_found_number_list:
+    print(f"board:\n{board}")
 
+
+
+# Play bingo
 last_num = -1
 for num in drawn_numbers:
+    print(f"Try number {num}")
     last_num = num
     winning_board_idx = -1
 
     for board_idx in range(len(boards)):
         winning_board_idx = check_number(num, boards[board_idx], board_idx, boards_found_number_list)
         if winning_board_idx > -1:
-            print(f"winning board found at index {winning_board_idx}!")
+            print(f"winning board found at board {winning_board_idx}!")
             break
 
     if winning_board_idx > -1:
         break
 
-# print(f"boards_found_number_list\n")
-# for found in boards_found_number_list:
-#     print(f"{found}")
+print(f"boards_found_number_list\n")
+for found in boards_found_number_list:
+    print(f"{found}")
 
 # Calculate the score
+print(f"Calculating score:")
 winning_board_sum = 0
 for row_idx in range(len(boards_found_number_list[winning_board_idx])):
     col_idx = 0
     for row_val in boards_found_number_list[winning_board_idx][row_idx]:
         if row_val == False:
             winning_board_sum = winning_board_sum + boards[winning_board_idx][row_idx][col_idx]
+            print(f"Adding {boards[winning_board_idx][row_idx][col_idx]}, sum now {winning_board_sum}")
         col_idx = col_idx + 1
 
 
+# Print the boards showing marked numbers
+# for board_idx in range(len(boards)):
+#     print(f"board_idx: {board_idx}")
+#     for row_idx in range(len(boards_found_number_list[board_idx])):
+#         col_idx = 0
+#         for row_val in boards_found_number_list[board_idx][row_idx]:
+#             if row_val == False:
+#                 print(f"    {boards[board_idx][row_idx][col_idx]}", end = '')
+#             else:
+#                 print(f"    [{boards[board_idx][row_idx][col_idx]}]", end = '')
+#             col_idx = col_idx + 1
+#         print(f"")
+#     print(f"")
+
+# Print winning board showing marked numbers
+print(f"winning_board_idx: {winning_board_idx}")
+for row_idx in range(len(boards_found_number_list[winning_board_idx])):
+    col_idx = 0
+    for row_val in boards_found_number_list[winning_board_idx][row_idx]:
+        if row_val == False:
+            print(f"    {boards[winning_board_idx][row_idx][col_idx]}", end = '')
+        else:
+            print(f"    [{boards[winning_board_idx][row_idx][col_idx]}]", end = '')
+        col_idx = col_idx + 1
+    print(f"")
+
+print(f"Number of boards: {len(boards)}")
 print(f"winning_board_sum = {winning_board_sum}, last_num: {last_num}, product: {winning_board_sum * last_num}")
 
-# 48618 is too high
+# 45031 
         
